@@ -36,40 +36,40 @@ def execution_query(query, params=None, fetch=True):
         st.error(f"Erreur de connexion BDD : {e}")
         return []
 
-# --- STYLE CSS AVANCÉ AVEC SUPPORT DES DEUX THÈMES ---
+# --- HYPER-FORCE MODE SOMBRE (CSS FONCE GLOBAL) ---
 st.markdown("""
     <style>
-    /* Style pour forcer la visibilité textuelle selon le thème du navigateur */
-    @media (prefers-color-scheme: light) {
-        .team-text { color: #000000 !important; font-weight: 700; font-size: 18px; }
-        .top-team-text { color: #000000 !important; }
+    /* Forcer l'application entière, le fond et la sidebar en sombre */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        background-color: #0e1117 !important;
+        color: #fafafa !important;
     }
-    @media (prefers-color-scheme: dark) {
-        .team-text { color: #FFFFFF !important; font-weight: 700; font-size: 18px; }
-        .top-team-text { color: #FFFFFF !important; }
-    }
-    
-    /* Bouton cliquable transparent invisible au-dessus du texte */
-    .invisible-button button {
-        background-color: transparent !important;
-        border: none !important;
-        color: transparent !important;
-        width: 100%;
-        text-align: left;
-        padding: 0px !important;
-        height: auto !important;
+    [data-testid="stSidebar"] {
+        background-color: #161920 !important;
     }
     
+    /* Forcer absolument TOUS les textes et paragraphes en blanc/gris clair */
+    h1, h2, h3, h4, h5, h6, p, label, span, li, div {
+        color: #fafafa !important;
+    }
+    
+    /* Configurer les boutons classiques pour qu'ils soient gris foncé avec écriture blanche */
     .stButton>button {
         width: 100%;
         border-radius: 8px;
-        background-color: transparent;
-        color: #e5e7eb;
-        border: 1px solid #374151;
-        font-weight: 600;
+        background-color: #262730 !important;
+        color: #ffffff !important;
+        border: 1px solid #4a4b50 !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
     }
-    .stButton>button:hover { background-color: #ff4b4b !important; color: white !important; border: none; }
+    .stButton>button:hover { 
+        background-color: #ff4b4b !important; 
+        color: white !important; 
+        border-color: #ff4b4b !important; 
+    }
     
+    /* Le bloc de score */
     .score-box {
         background: linear-gradient(135deg, #262730 0%, #111111 100%);
         padding: 8px 15px;
@@ -77,11 +77,10 @@ st.markdown("""
         text-align: center;
         font-weight: 800;
         font-size: 22px;
-        color: #ff4b4b;
+        color: #ff4b4b !important;
         border: 1px solid #374151;
     }
     .logo-container { display: flex; justify-content: center; align-items: center; height: 100%; }
-    .team-container { display: flex; align-items: center; height: 100%; cursor: pointer; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -127,7 +126,7 @@ if st.session_state.page == 'home':
     
     if top_teams:
         for idx, team in enumerate(top_teams, 1):
-            st.sidebar.markdown(f"<div class='top-team-text'>{idx}. {team[0]} - **{team[1]} pts**</div>", unsafe_allow_html=True)
+            st.sidebar.write(f"{idx}. {team[0]} - **{team[1]} pts**")
     else:
         st.sidebar.write("Aucun match terminé pour cette ligue.")
 
@@ -159,14 +158,10 @@ if st.session_state.page == 'home':
             with st.container():
                 col1, col2, col3, col4, col5 = st.columns([3, 1, 2, 1, 3])
                 
-                # Équipe Domicile (Texte stylisé adaptatif + Bouton invisible pour le clic)
+                # Bouton Équipe Domicile classique (Gris foncé, texte blanc forcé)
                 with col1:
-                    st.markdown(f'<div class="team-container"><span class="team-text">{h_nom}</span></div>', unsafe_allow_html=True)
-                    with st.container(border=False):
-                        st.markdown('<div class="invisible-button">', unsafe_allow_html=True)
-                        if st.button("", key=f"h_{mid}"):
-                            st.session_state.selected_team = hid; st.session_state.page = 'team_details'; st.rerun()
-                        st.markdown('</div>', unsafe_allow_html=True)
+                    if st.button(h_nom, key=f"h_{mid}"):
+                        st.session_state.selected_team = hid; st.session_state.page = 'team_details'; st.rerun()
                         
                 with col2:
                     st.markdown(f'<div class="logo-container"><img src="{h_crest}" width="40"></div>', unsafe_allow_html=True)
@@ -178,14 +173,10 @@ if st.session_state.page == 'home':
                 with col4:
                     st.markdown(f'<div class="logo-container"><img src="{a_crest}" width="40"></div>', unsafe_allow_html=True)
                 
-                # Équipe Extérieur (Texte stylisé adaptatif + Bouton invisible pour le clic)
+                # Bouton Équipe Extérieur classique (Gris foncé, texte blanc forcé)
                 with col5:
-                    st.markdown(f'<div class="team-container" style="justify-content: flex-end;"><span class="team-text">{a_nom}</span></div>', unsafe_allow_html=True)
-                    with st.container(border=False):
-                        st.markdown('<div class="invisible-button">', unsafe_allow_html=True)
-                        if st.button("", key=f"a_{mid}"):
-                            st.session_state.selected_team = aid; st.session_state.page = 'team_details'; st.rerun()
-                        st.markdown('</div>', unsafe_allow_html=True)
+                    if st.button(a_nom, key=f"a_{mid}"):
+                        st.session_state.selected_team = aid; st.session_state.page = 'team_details'; st.rerun()
                         
                 st.markdown("<br>", unsafe_allow_html=True)
     else:
