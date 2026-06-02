@@ -15,7 +15,7 @@ st.set_page_config(page_title="ElitePro 37", layout="wide", page_icon="⚽")
 
 # Configuration de la connexion PostgreSQL
 DB_HOST = "elitepro37-db.postgres.database.azure.com"
-DB_NAME = "postgres"  # Par défaut Azure crée une base nommée postgres
+DB_NAME = "postgres"  
 DB_USER = "postgres"
 DB_PASSWORD = "FootAzure2026!"  # Remplace par ton vrai mot de passe
 DB_PORT = "5432"
@@ -36,10 +36,30 @@ def execution_query(query, params=None, fetch=True):
         st.error(f"Erreur de connexion BDD : {e}")
         return []
 
-# --- STYLE CSS AVANCÉ ---
+# --- STYLE CSS AVANCÉ AVEC SUPPORT DES DEUX THÈMES ---
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
+    /* Style pour forcer la visibilité textuelle selon le thème du navigateur */
+    @media (prefers-color-scheme: light) {
+        .team-text { color: #000000 !important; font-weight: 700; font-size: 18px; }
+        .top-team-text { color: #000000 !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+        .team-text { color: #FFFFFF !important; font-weight: 700; font-size: 18px; }
+        .top-team-text { color: #FFFFFF !important; }
+    }
+    
+    /* Bouton cliquable transparent invisible au-dessus du texte */
+    .invisible-button button {
+        background-color: transparent !important;
+        border: none !important;
+        color: transparent !important;
+        width: 100%;
+        text-align: left;
+        padding: 0px !important;
+        height: auto !important;
+    }
+    
     .stButton>button {
         width: 100%;
         border-radius: 8px;
@@ -49,6 +69,7 @@ st.markdown("""
         font-weight: 600;
     }
     .stButton>button:hover { background-color: #ff4b4b !important; color: white !important; border: none; }
+    
     .score-box {
         background: linear-gradient(135deg, #262730 0%, #111111 100%);
         padding: 8px 15px;
@@ -60,6 +81,7 @@ st.markdown("""
         border: 1px solid #374151;
     }
     .logo-container { display: flex; justify-content: center; align-items: center; height: 100%; }
+    .team-container { display: flex; align-items: center; height: 100%; cursor: pointer; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -105,7 +127,7 @@ if st.session_state.page == 'home':
     
     if top_teams:
         for idx, team in enumerate(top_teams, 1):
-            st.sidebar.write(f"{idx}. {team[0]} - **{team[1]} pts**")
+            st.sidebar.markdown(f"<div class='top-team-text'>{idx}. {team[0]} - **{team[1]} pts**</div>", unsafe_allow_html=True)
     else:
         st.sidebar.write("Aucun match terminé pour cette ligue.")
 
@@ -137,9 +159,15 @@ if st.session_state.page == 'home':
             with st.container():
                 col1, col2, col3, col4, col5 = st.columns([3, 1, 2, 1, 3])
                 
+                # Équipe Domicile (Texte stylisé adaptatif + Bouton invisible pour le clic)
                 with col1:
-                    if st.button(h_nom, key=f"h_{mid}"):
-                        st.session_state.selected_team = hid; st.session_state.page = 'team_details'; st.rerun()
+                    st.markdown(f'<div class="team-container"><span class="team-text">{h_nom}</span></div>', unsafe_allow_html=True)
+                    with st.container(border=False):
+                        st.markdown('<div class="invisible-button">', unsafe_allow_html=True)
+                        if st.button("", key=f"h_{mid}"):
+                            st.session_state.selected_team = hid; st.session_state.page = 'team_details'; st.rerun()
+                        st.markdown('</div>', unsafe_allow_html=True)
+                        
                 with col2:
                     st.markdown(f'<div class="logo-container"><img src="{h_crest}" width="40"></div>', unsafe_allow_html=True)
                 
@@ -149,9 +177,16 @@ if st.session_state.page == 'home':
                 
                 with col4:
                     st.markdown(f'<div class="logo-container"><img src="{a_crest}" width="40"></div>', unsafe_allow_html=True)
+                
+                # Équipe Extérieur (Texte stylisé adaptatif + Bouton invisible pour le clic)
                 with col5:
-                    if st.button(a_nom, key=f"a_{mid}"):
-                        st.session_state.selected_team = aid; st.session_state.page = 'team_details'; st.rerun()
+                    st.markdown(f'<div class="team-container" style="justify-content: flex-end;"><span class="team-text">{a_nom}</span></div>', unsafe_allow_html=True)
+                    with st.container(border=False):
+                        st.markdown('<div class="invisible-button">', unsafe_allow_html=True)
+                        if st.button("", key=f"a_{mid}"):
+                            st.session_state.selected_team = aid; st.session_state.page = 'team_details'; st.rerun()
+                        st.markdown('</div>', unsafe_allow_html=True)
+                        
                 st.markdown("<br>", unsafe_allow_html=True)
     else:
         st.info("Aucun match trouvé pour ces critères dans la base de données locale.")
