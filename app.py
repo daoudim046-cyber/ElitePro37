@@ -1,3 +1,4 @@
+# Relance forcée pour mise à jour Azure
 import os
 import sys
 
