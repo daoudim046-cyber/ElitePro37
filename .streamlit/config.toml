@@ -1,0 +1,10 @@
+[theme]
+primaryColor = "#ff4b4b"
+backgroundColor = "#0e1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#fafafa"
+font = "sans serif"
+
+[ui]
+# Cette option permet de masquer le bouton de sélection du thème dans le menu en haut à droite
+hideTopBarMenu = false
